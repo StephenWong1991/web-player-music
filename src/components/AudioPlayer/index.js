@@ -1,10 +1,8 @@
 import { useState, useRef, useEffect, Fragment } from "react";
 import audioAnalyser from "./audioAnalyser";
-import imusic from "../../materials/卡奇社-日光倾城.flac";
-import cover from "../../materials/T002R300x300M000004Q9eyj0RYSrw_1.webp";
 
-const radius = 450;
-const coverRadius = 430;
+const radius = 480;
+const coverRadius = radius - 30;
 const rectWidth = 5;
 
 let rotation = 0; // 初始旋转角度
@@ -12,6 +10,7 @@ let rotation = 0; // 初始旋转角度
 const loadImage = async (src) => {
   return new Promise((resolve, reject) => {
     const image = new window.Image();
+    image.setAttribute("crossOrigin", "anonymous");
     image.onload = () => resolve(image);
     image.src = src;
   });
@@ -43,7 +42,9 @@ const AudioPlayer = () => {
   useEffect(() => {
     ctxRef.current = canvasRef.current.getContext("2d");
     const draftArray = Array.from({ length: 256 }, () => 5);
-    loadImage(cover).then((img) => {
+    loadImage(
+      "http://p2.music.126.net/e9NayWFI395VUeYantarWg==/109951163580419226.jpg?param=130y130"
+    ).then((img) => {
       coverRef.current = img;
       if (!isPlayingRef.current) {
         draw(draftArray);
@@ -101,11 +102,11 @@ const AudioPlayer = () => {
       rotation += 0.01;
     }
 
-    ctx.strokeStyle = ctx.fillStyle = "blue";
+    ctx.strokeStyle = ctx.fillStyle = "#ec9446";
 
     ctx.beginPath();
     for (let i = 0; i < rectCount; i++) {
-      const rectHeight = Math.max(datas[i] * 0.3, 5);
+      const rectHeight = Math.max(datas[i] * 0.5, 5);
       const angle = startAngle + (i / rectCount) * 2 * Math.PI;
       const rectX = centerX + radius * Math.cos(angle) - rectWidth / 2;
       const rectY = centerY + radius * Math.sin(angle) - rectHeight / 2;
@@ -162,15 +163,20 @@ const AudioPlayer = () => {
         style={{ width: size.width, height: size.height }}
       />
       <audio
-        src={imusic}
         controls
+        crossOrigin="anonymous"
         ref={audioRef}
         onLoadedData={handleLoadedData}
         onPlay={handleOnPlay}
         onSeeking={() => console.log("loading...")}
         onSeeked={() => console.log("loaded")}
         onPause={handleOnPause}
-      ></audio>
+      >
+        <source
+          src="https://m701.music.126.net/20230626004502/4ee310eb6f9cf0bfe30ea81e84fc413b/jdyyaac/5458/560e/0e5c/c2b021013fadd328f32b968bd9f15cb6.m4a"
+          type="audio/mpeg"
+        />
+      </audio>
     </Fragment>
   );
 };
