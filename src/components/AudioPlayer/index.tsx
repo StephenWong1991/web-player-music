@@ -7,6 +7,7 @@ import { loadImage } from "../../utils";
 
 enum MusicEffect {
   ARC = "arc-waveform",
+  ARC_LINE = "arc-line-waveform",
   BAR = "bar-waveform",
 }
 
@@ -50,7 +51,7 @@ const AudioPlayer: React.FC = () => {
     renderCurrentTime(draftArray);
     loadImage(
       process.env.PUBLIC_URL +
-        "/static/music/T002R300x300M000002Neh8l0uciQZ_1.webp"
+        "/static/music/T002R300x300M000003pJFsY35M38z_1.webp"
     ).then((img) => {
       coverRef.current = img as HTMLImageElement;
       if (!isPlayingRef.current) {
@@ -79,6 +80,11 @@ const AudioPlayer: React.FC = () => {
     if (lastEffect.current === MusicEffect.ARC) {
       waveformEffect.drawCover(coverRef.current, ctx);
       waveformEffect.drawArcWaveform(ctx, datas);
+    }
+
+    if (lastEffect.current === MusicEffect.ARC_LINE) {
+      waveformEffect.drawCover(coverRef.current, ctx);
+      waveformEffect.drawArcLineWaveform(ctx, datas);
     }
 
     if (lastEffect.current === MusicEffect.BAR) {
@@ -134,8 +140,7 @@ const AudioPlayer: React.FC = () => {
       />
       <audio
         controls
-        // autoPlay
-        preload="auto"
+        autoPlay
         crossOrigin="anonymous"
         ref={audioRef}
         onLoadedMetadata={handleLoadedMetadata}
@@ -146,8 +151,8 @@ const AudioPlayer: React.FC = () => {
         onSeeked={() => console.log("seeked")}
       >
         <source
-          src={process.env.PUBLIC_URL + "/static/music/C400003VLsik0ztbIb.mp4"}
-          type="audio/mpeg"
+          src={process.env.PUBLIC_URL + "/static/music/C400001hagjX2qGWlP.mp4"}
+          type="video/mp4"
         />
       </audio>
     </Fragment>

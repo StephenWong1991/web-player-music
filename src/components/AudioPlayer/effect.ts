@@ -4,11 +4,21 @@ class WaveformEffect {
   private coverRadius = this.radius - 30;
   private rectWidth = 5; // 初始旋转角度
 
+  // arc-line
+  private arcLineMaxMultiple = 0.8;
+  private arcLineMultipleStep = 0.1;
+  private prevPoints: { angle: number; wave: number }[][] = [];
+  private prevPointLength = 7;
+
   // common
   private rotation = 0;
 
   // bar
   private capYPositionArray: number[] = [];
+
+  waveColor(opacity = 1) {
+    return `rgba(236, 148, 70, ${opacity})`;
+  }
 
   drawBlurBg(img: HTMLImageElement | null, ctx: CanvasRenderingContext2D) {
     if (!img) return;
@@ -65,7 +75,7 @@ class WaveformEffect {
     const startAngle = Math.PI; // 270 度
     const rectCount = waveformList.length;
 
-    ctx.strokeStyle = ctx.fillStyle = "#ec9446";
+    ctx.strokeStyle = ctx.fillStyle = this.waveColor();
     ctx.beginPath();
 
     for (let i = 0; i < rectCount; i++) {
@@ -92,6 +102,85 @@ class WaveformEffect {
     }
 
     ctx.fill();
+  }
+
+  drawArcLineWaveform(ctx: CanvasRenderingContext2D, datas: Uint8Array) {
+    const len = datas.length;
+    const offset = Math.floor((len * 2) / 3);
+    const waveformList = new Array(offset * 2);
+
+    for (let i = 0; i < offset; i++) {
+      waveformList[i] = waveformList[waveformList.length - i - 1] = datas[i];
+    }
+
+    const { width, height } = ctx.canvas;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const startAngle = Math.PI; // 270 度
+    const rectCount = waveformList.length;
+    const point: { angle: number; wave: number }[] = [];
+
+    ctx.lineWidth = 5;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = ctx.fillStyle = this.waveColor();
+    ctx.beginPath();
+
+    let prevPoint = { x: 0, y: 0 };
+
+    for (let i = 0; i < rectCount; i++) {
+      const angle = startAngle + (i / rectCount) * 2 * Math.PI;
+      const pointRadius =
+        this.radius + Math.max(waveformList[i] * this.arcLineMaxMultiple, 5);
+      const x = centerX + pointRadius * Math.cos(angle);
+      const y = centerY + pointRadius * Math.sin(angle);
+
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        const controlX = (x + prevPoint.x) / 2;
+        const controlY = (y + prevPoint.y) / 2;
+        ctx.quadraticCurveTo(prevPoint.x, prevPoint.y, controlX, controlY);
+      }
+
+      prevPoint.x = x;
+      prevPoint.y = y;
+
+      point.push({ angle, wave: waveformList[i] });
+    }
+
+    ctx.closePath();
+    ctx.stroke();
+
+    this.prevPoints.push(point);
+    if (this.prevPoints.length > this.prevPointLength) {
+      this.prevPoints.shift();
+    }
+
+    this.prevPoints.forEach((item, index) => {
+      const multiple =
+        this.arcLineMaxMultiple - this.arcLineMultipleStep * (index + 1);
+      ctx.strokeStyle = this.waveColor(1 - index / this.prevPoints.length);
+      ctx.beginPath();
+
+      for (let i = 0; i < item.length; i++) {
+        const pointRadius = this.radius + Math.max(item[i].wave * multiple, 5);
+        const x = centerX + pointRadius * Math.cos(item[i].angle);
+        const y = centerY + pointRadius * Math.sin(item[i].angle);
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          const controlX = (x + prevPoint.x) / 2;
+          const controlY = (y + prevPoint.y) / 2;
+          ctx.quadraticCurveTo(prevPoint.x, prevPoint.y, controlX, controlY);
+        }
+        prevPoint.x = x;
+        prevPoint.y = y;
+      }
+
+      ctx.closePath();
+      ctx.stroke();
+    });
   }
 
   initCapYPositionArray() {
