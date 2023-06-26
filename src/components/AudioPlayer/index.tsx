@@ -4,8 +4,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import audioAnalyser from "./audioAnalyser";
 import waveformEffect from "./effect";
 import { loadImage } from "../../utils";
-import musicUrl from "../../music/C400003VLsik0ztbIb.mp4";
-import coverUrl from "../../music/T002R300x300M000002Neh8l0uciQZ_1.webp";
 
 enum MusicEffect {
   ARC = "arc-waveform",
@@ -50,7 +48,10 @@ const AudioPlayer: React.FC = () => {
     }
     const draftArray: Uint8Array = new Uint8Array(256);
     renderCurrentTime(draftArray);
-    loadImage(coverUrl).then((img) => {
+    loadImage(
+      process.env.PUBLIC_URL +
+        "/static/music/T002R300x300M000002Neh8l0uciQZ_1.webp"
+    ).then((img) => {
       coverRef.current = img as HTMLImageElement;
       if (!isPlayingRef.current) {
         renderCurrentTime(draftArray);
@@ -133,7 +134,7 @@ const AudioPlayer: React.FC = () => {
       />
       <audio
         controls
-        autoPlay
+        // autoPlay
         preload="auto"
         crossOrigin="anonymous"
         ref={audioRef}
@@ -144,7 +145,10 @@ const AudioPlayer: React.FC = () => {
         onSeeking={() => console.log("seeking...")}
         onSeeked={() => console.log("seeked")}
       >
-        <source src={musicUrl} type="audio/mpeg" />
+        <source
+          src={process.env.PUBLIC_URL + "/static/music/C400003VLsik0ztbIb.mp4"}
+          type="audio/mpeg"
+        />
       </audio>
     </Fragment>
   );
