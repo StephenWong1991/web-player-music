@@ -1,32 +1,30 @@
-import { useState, useRef, useEffect, Fragment } from "react";
+import React, { useState, useRef, useEffect, Fragment } from "react";
 import audioAnalyser from "./audioAnalyser";
+import { loadImage } from "../../utils";
+import musicUrl from "../../music/5458_560e_0e5c_c2b021013fadd328f32b968bd9f15cb6.m4a";
+import coverUrl from "../../music/109951163580419226.jpeg";
 
-const radius = 480;
+// const musicUrl =
+//   "https://m701.music.126.net/20230626004502/4ee310eb6f9cf0bfe30ea81e84fc413b/jdyyaac/5458/560e/0e5c/c2b021013fadd328f32b968bd9f15cb6.m4a";
+// const coverUrl =
+//   "http://p2.music.126.net/e9NayWFI395VUeYantarWg==/109951163580419226.jpg?param=130y130";
+
+const radius = 450;
 const coverRadius = radius - 30;
 const rectWidth = 5;
-
 let rotation = 0; // 初始旋转角度
 
-const loadImage = async (src) => {
-  return new Promise((resolve, reject) => {
-    const image = new window.Image();
-    image.setAttribute("crossOrigin", "anonymous");
-    image.onload = () => resolve(image);
-    image.src = src;
-  });
-};
-
-const AudioPlayer = () => {
+const AudioPlayer: React.FC = () => {
   const [size, setSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
-  const audioRef = useRef();
-  const canvasRef = useRef();
-  const ctxRef = useRef();
-  const loopIdRef = useRef();
-  const isPlayingRef = useRef();
-  const coverRef = useRef();
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const loopIdRef = useRef<number | null>(null);
+  const isPlayingRef = useRef<boolean>(false);
+  const coverRef = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -40,12 +38,12 @@ const AudioPlayer = () => {
   }, []);
 
   useEffect(() => {
-    ctxRef.current = canvasRef.current.getContext("2d");
+    ctxRef.current = canvasRef.current?.getContext(
+      "2d"
+    ) as CanvasRenderingContext2D;
     const draftArray = Array.from({ length: 256 }, () => 5);
-    loadImage(
-      "http://p2.music.126.net/e9NayWFI395VUeYantarWg==/109951163580419226.jpg?param=130y130"
-    ).then((img) => {
-      coverRef.current = img;
+    loadImage(coverUrl).then((img) => {
+      coverRef.current = img as HTMLImageElement;
       if (!isPlayingRef.current) {
         draw(draftArray);
       }
@@ -53,8 +51,10 @@ const AudioPlayer = () => {
     draw(draftArray);
   }, []);
 
-  const draw = (datas) => {
+  const draw = (datas: number[]) => {
     const ctx = ctxRef.current;
+    if (!ctx) return;
+
     const centerX = ctx.canvas.width / 2;
     const centerY = ctx.canvas.height / 2;
     const startAngle = Math.PI; // 270 度
@@ -65,7 +65,7 @@ const AudioPlayer = () => {
     if (coverRef.current) {
       ctx.save();
       ctx.fillStyle = "#ffffff00";
-      ctx.filter = `blur(80px)`;
+      ctx.filter = "blur(80px)";
       ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       ctx.drawImage(
         coverRef.current,
@@ -125,7 +125,7 @@ const AudioPlayer = () => {
 
   const update = () => {
     if (!isPlayingRef.current) {
-      window.cancelAnimationFrame(loopIdRef.current);
+      window.cancelAnimationFrame(loopIdRef.current!);
       return;
     }
     audioAnalyser.analyser.getByteFrequencyData(audioAnalyser.buffer);
@@ -141,8 +141,10 @@ const AudioPlayer = () => {
     loopIdRef.current = window.requestAnimationFrame(update);
   };
 
-  const handleLoadedData = () => {
-    audioAnalyser.createAnalyser(audioRef.current);
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      audioAnalyser.createAnalyser(audioRef.current);
+    }
   };
 
   const handleOnPlay = () => {
@@ -166,16 +168,13 @@ const AudioPlayer = () => {
         controls
         crossOrigin="anonymous"
         ref={audioRef}
-        onLoadedData={handleLoadedData}
+        onLoadedMetadata={handleLoadedMetadata}
         onPlay={handleOnPlay}
         onSeeking={() => console.log("loading...")}
         onSeeked={() => console.log("loaded")}
         onPause={handleOnPause}
       >
-        <source
-          src="https://m701.music.126.net/20230626004502/4ee310eb6f9cf0bfe30ea81e84fc413b/jdyyaac/5458/560e/0e5c/c2b021013fadd328f32b968bd9f15cb6.m4a"
-          type="audio/mpeg"
-        />
+        <source src={musicUrl} type="audio/mpeg" />
       </audio>
     </Fragment>
   );
