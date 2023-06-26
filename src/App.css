@@ -13,6 +13,12 @@ body {
   position: relative;
 }
 
+.effects {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
 audio {
   position: absolute;
   left: 50%;
