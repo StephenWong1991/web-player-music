@@ -133,6 +133,7 @@ const AudioPlayer: React.FC = () => {
       />
       <audio
         controls
+        autoPlay
         preload="auto"
         crossOrigin="anonymous"
         ref={audioRef}
