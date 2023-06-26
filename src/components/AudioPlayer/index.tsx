@@ -169,7 +169,7 @@ const AudioPlayer: React.FC = () => {
         onSeeked={() => console.log("seeked")}
       >
         <source
-          src={process.env.PUBLIC_URL + "/static/music/C400001hagjX2qGWlP.mp4"}
+          src={process.env.PUBLIC_URL + "/static/music/C400001hagjX2qGWlP.mp3"}
           type="video/mp4"
         />
       </audio>
