@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, Fragment } from "react";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
+import { SketchPicker } from "react-color";
 import audioAnalyser from "./audioAnalyser";
 import waveformEffect from "./effect";
 import { loadImage } from "../../utils";
@@ -21,6 +22,7 @@ const AudioPlayer: React.FC = () => {
     height: window.innerHeight,
   });
   const [effect, setEffect] = useState<MusicEffect>(MusicEffect.ARC);
+  const [color, setColor] = useState(waveformEffect.getWaveColor());
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -118,6 +120,11 @@ const AudioPlayer: React.FC = () => {
     isPlayingRef.current = false;
   };
 
+  const handleChangeColor = (color) => {
+    setColor(color.rgb);
+    waveformEffect.updateWaveColor(color.rgb);
+  };
+
   return (
     <Fragment>
       <div className={`effects ${classes.root}`}>
@@ -132,6 +139,17 @@ const AudioPlayer: React.FC = () => {
           </Button>
         ))}
       </div>
+      <div className="sketchPicker">
+        <span style={{ color: `rgb(${color.r}, ${color.g}, ${color.b})` }}>
+          wave color
+        </span>
+        <SketchPicker
+          disableAlpha
+          color={color}
+          // onChangeComplete={handleChangeColor}
+          onChange={handleChangeColor}
+        />
+      </div>
       <canvas
         ref={canvasRef}
         width={size.width * window.devicePixelRatio}
@@ -141,7 +159,7 @@ const AudioPlayer: React.FC = () => {
       <audio
         controls
         autoPlay
-        crossOrigin="anonymous"
+        // crossOrigin="anonymous"
         ref={audioRef}
         onLoadedMetadata={handleLoadedMetadata}
         onPlay={handleOnPlay}

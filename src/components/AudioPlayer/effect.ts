@@ -1,4 +1,9 @@
 class WaveformEffect {
+  // color
+  private r = 236;
+  private g = 148;
+  private b = 70;
+
   // arc
   private radius = 450;
   private coverRadius = this.radius - 30;
@@ -17,7 +22,21 @@ class WaveformEffect {
   private capYPositionArray: number[] = [];
 
   waveColor(opacity = 1) {
-    return `rgba(236, 148, 70, ${opacity})`;
+    return `rgba(${this.r}, ${this.g}, ${this.b}, ${opacity})`;
+  }
+
+  updateWaveColor(color: { r: number; g: number; b: number }) {
+    this.r = color.r;
+    this.g = color.g;
+    this.b = color.b;
+  }
+
+  getWaveColor() {
+    return {
+      r: this.r,
+      g: this.g,
+      b: this.b,
+    };
   }
 
   drawBlurBg(img: HTMLImageElement | null, ctx: CanvasRenderingContext2D) {
