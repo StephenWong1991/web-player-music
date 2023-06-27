@@ -9,6 +9,7 @@ import { loadImage } from "../../utils";
 enum MusicEffect {
   ARC = "arc-waveform",
   ARC_LINE = "arc-line-waveform",
+  ARC_LINE_DOTTED = "arc-line-dotted-waveform",
   BAR = "bar-waveform",
 }
 
@@ -70,6 +71,8 @@ const AudioPlayer: React.FC = () => {
 
   useEffect(() => {
     waveformEffect.initCapYPositionArray();
+    audioAnalyser.analyser.getByteFrequencyData(audioAnalyser.buffer);
+    renderCurrentTime(audioAnalyser.buffer);
   }, [effect]);
 
   const renderCurrentTime = (datas: Uint8Array) => {
@@ -88,6 +91,11 @@ const AudioPlayer: React.FC = () => {
     if (lastEffect.current === MusicEffect.ARC_LINE) {
       waveformEffect.drawCover(coverRef.current, ctx);
       waveformEffect.drawArcLineWaveform(ctx, datas);
+    }
+
+    if (lastEffect.current === MusicEffect.ARC_LINE_DOTTED) {
+      waveformEffect.drawArcLineDottedWaveform(ctx, datas);
+      waveformEffect.drawCover(coverRef.current, ctx);
     }
 
     if (lastEffect.current === MusicEffect.BAR) {
@@ -187,7 +195,10 @@ const AudioPlayer: React.FC = () => {
         onSeeked={() => console.log("seeked")}
       >
         <source
-          src={process.env.PUBLIC_URL + "/static/music/light/C40000269pkB4fcQVa.mp4"}
+          src={
+            process.env.PUBLIC_URL +
+            "/static/music/light/C40000269pkB4fcQVa.mp4"
+          }
           type="video/mp4"
         />
       </video>

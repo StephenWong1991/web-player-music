@@ -15,6 +15,9 @@ class WaveformEffect {
   private prevPoints: { angle: number; wave: number }[][] = [];
   private prevPointLength = 7;
 
+  // arc-line-dotted
+  private arcLineDottedMultiple = 0.3;
+
   // common
   private rotation = 0;
 
@@ -145,6 +148,7 @@ class WaveformEffect {
     ctx.strokeStyle = ctx.fillStyle = this.waveColor();
     ctx.beginPath();
 
+    let firstPoint = { x: 0, y: 0 };
     let prevPoint = { x: 0, y: 0 };
 
     for (let i = 0; i < rectCount; i++) {
@@ -156,6 +160,8 @@ class WaveformEffect {
 
       if (i === 0) {
         ctx.moveTo(x, y);
+        firstPoint.x = x;
+        firstPoint.y = y;
       } else {
         const controlX = (x + prevPoint.x) / 2;
         const controlY = (y + prevPoint.y) / 2;
@@ -167,6 +173,10 @@ class WaveformEffect {
 
       point.push({ angle, wave: waveformList[i] });
     }
+
+    const controlX = (firstPoint.x + prevPoint.x) / 2;
+    const controlY = (firstPoint.y + prevPoint.y) / 2;
+    ctx.quadraticCurveTo(prevPoint.x, prevPoint.y, controlX, controlY);
 
     ctx.closePath();
     ctx.stroke();
@@ -188,6 +198,8 @@ class WaveformEffect {
         const y = centerY + pointRadius * Math.sin(item[i].angle);
         if (i === 0) {
           ctx.moveTo(x, y);
+          firstPoint.x = x;
+          firstPoint.y = y;
         } else {
           const controlX = (x + prevPoint.x) / 2;
           const controlY = (y + prevPoint.y) / 2;
@@ -197,9 +209,66 @@ class WaveformEffect {
         prevPoint.y = y;
       }
 
+      const controlX = (firstPoint.x + prevPoint.x) / 2;
+      const controlY = (firstPoint.y + prevPoint.y) / 2;
+      ctx.quadraticCurveTo(prevPoint.x, prevPoint.y, controlX, controlY);
+
       ctx.closePath();
       ctx.stroke();
     });
+  }
+
+  drawArcLineDottedWaveform(ctx: CanvasRenderingContext2D, datas: Uint8Array) {
+    const step = 5;
+    const len = datas.length;
+    const waveformList = new Array(len);
+
+    for (let i = 0; i < len + step; i++) {
+      waveformList[i] = datas[i] ?? datas[0];
+    }
+
+    const { width, height } = ctx.canvas;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const startAngle = Math.PI; // 270 度
+    const rectCount = waveformList.length;
+
+    ctx.lineWidth = 5;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = ctx.fillStyle = this.waveColor(0.5);
+    ctx.beginPath();
+
+    let firstPoint = { x: 0, y: 0 };
+    let prevPoint = { x: 0, y: 0 };
+
+    for (let i = 0; i < rectCount; i += step) {
+      const angle = startAngle + (i / rectCount) * 2 * Math.PI;
+      const pointRadius =
+        this.radius + Math.max(waveformList[i] * this.arcLineDottedMultiple, 5);
+      const x = centerX + pointRadius * Math.cos(angle);
+      const y = centerY + pointRadius * Math.sin(angle);
+
+      if (i === 0) {
+        ctx.moveTo(x, y);
+        firstPoint.x = x;
+        firstPoint.y = y;
+      } else {
+        const controlX = (x + prevPoint.x) / 2;
+        const controlY = (y + prevPoint.y) / 2;
+        ctx.quadraticCurveTo(prevPoint.x, prevPoint.y, controlX, controlY);
+      }
+
+      prevPoint.x = x;
+      prevPoint.y = y;
+    }
+
+    const controlX = (firstPoint.x + prevPoint.x) / 2;
+    const controlY = (firstPoint.y + prevPoint.y) / 2;
+    ctx.quadraticCurveTo(prevPoint.x, prevPoint.y, controlX, controlY);
+
+    ctx.closePath();
+    ctx.fill();
   }
 
   initCapYPositionArray() {
