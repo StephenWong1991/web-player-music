@@ -24,7 +24,8 @@ const AudioPlayer: React.FC = () => {
   const [effect, setEffect] = useState<MusicEffect>(MusicEffect.ARC);
   const [color, setColor] = useState(waveformEffect.getWaveColor());
 
-  const audioRef = useRef<HTMLAudioElement>(null);
+  // const audioRef = useRef<HTMLAudioElement>(null);
+  const audioRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const loopIdRef = useRef<number | null>(null);
@@ -53,7 +54,7 @@ const AudioPlayer: React.FC = () => {
     renderCurrentTime(draftArray);
     loadImage(
       process.env.PUBLIC_URL +
-        "/static/music/T002R300x300M000003pJFsY35M38z_1.webp"
+        "/static/music/light/T002R300x300M000001bxCCd4F99oN_1.webp"
     ).then((img) => {
       coverRef.current = img as HTMLImageElement;
       if (!isPlayingRef.current) {
@@ -156,7 +157,7 @@ const AudioPlayer: React.FC = () => {
         height={size.height * window.devicePixelRatio}
         style={{ width: size.width, height: size.height }}
       />
-      <audio
+      {/* <audio
         controls
         autoPlay
         // crossOrigin="anonymous"
@@ -172,7 +173,24 @@ const AudioPlayer: React.FC = () => {
           src={process.env.PUBLIC_URL + "/static/music/C400001hagjX2qGWlP.mp3"}
           type="video/mp4"
         />
-      </audio>
+      </audio> */}
+      <video
+        controls
+        autoPlay
+        crossOrigin="anonymous"
+        ref={audioRef}
+        onLoadedMetadata={handleLoadedMetadata}
+        onPlay={handleOnPlay}
+        onPause={handleOnPause}
+        onCanPlayThrough={() => console.log("canplay")}
+        onSeeking={() => console.log("seeking...")}
+        onSeeked={() => console.log("seeked")}
+      >
+        <source
+          src={process.env.PUBLIC_URL + "/static/music/light/C40000269pkB4fcQVa.mp4"}
+          type="video/mp4"
+        />
+      </video>
     </Fragment>
   );
 };

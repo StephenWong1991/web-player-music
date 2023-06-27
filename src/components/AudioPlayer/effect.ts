@@ -279,4 +279,6 @@ class WaveformEffect {
   }
 }
 
-export default new WaveformEffect();
+const waveformEffect = new WaveformEffect();
+
+export default waveformEffect;

@@ -26,12 +26,13 @@ body {
   text-align: right;
 }
 
-.sketchPicker > span {
+.sketchPicker>span {
   font-size: 26px;
   font-weight: bold;
 }
 
-audio {
+audio,
+video {
   position: absolute;
   left: 50%;
   bottom: 20px;

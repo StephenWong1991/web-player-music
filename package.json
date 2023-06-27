@@ -1,7 +1,7 @@
 {
   "name": "web-player-music",
   "version": "0.1.0",
-  "homepage": "./",
+  "homepage": "https://stephenwong1991.github.io/web-player-music/",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.12.4",
@@ -22,6 +22,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
