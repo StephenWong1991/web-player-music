@@ -1,20 +1,35 @@
 import React, { useState, useRef, useEffect, Fragment } from "react";
 import Button from "@material-ui/core/Button";
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import { makeStyles } from "@material-ui/core/styles";
 import { SketchPicker } from "react-color";
+import { createAudio } from "./audio";
 import audioAnalyser from "./audioAnalyser";
 import waveformEffect from "./effect";
 import { loadImage } from "../../utils";
 
+import musicInfo from "../../mock";
+
 enum MusicEffect {
-  ARC = "arc-waveform",
-  ARC_LINE = "arc-line-waveform",
-  ARC_LINE_DOTTED = "arc-line-dotted-waveform",
-  BAR = "bar-waveform",
+  ARC = "arc",
+  ARC_LINE = "arc-line",
+  ARC_LINE_DOTTED = "arc-line-dotted",
+  BAR = "bar",
 }
 
 const useStyles = makeStyles((theme) => ({
-  root: { "& > *": { margin: theme.spacing(1) } },
+  root: {
+    "& > *": {
+      display: "flex",
+      "flex-direction": "column",
+      margin: theme.spacing(1),
+    },
+  },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff",
+  },
 }));
 
 const AudioPlayer: React.FC = () => {
@@ -23,19 +38,39 @@ const AudioPlayer: React.FC = () => {
     height: window.innerHeight,
   });
   const [effect, setEffect] = useState<MusicEffect>(MusicEffect.ARC);
-  const [color, setColor] = useState(waveformEffect.getWaveColor());
+  const [color, setColor] = useState<{ r: number; g: number; b: number }>(
+    waveformEffect.getWaveColor()
+  );
+  const [open, setOpen] = useState<boolean>(true);
 
-  // const audioRef = useRef<HTMLAudioElement>(null);
-  const audioRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const loopIdRef = useRef<number | null>(null);
   const isPlayingRef = useRef<boolean>(false);
   const coverRef = useRef<HTMLImageElement | null>(null);
   const lastEffect = useRef<MusicEffect>(MusicEffect.ARC);
+  const initialized = useRef<boolean>(false);
 
   lastEffect.current = effect;
   const classes = useStyles();
+
+  useEffect(() => {
+    if (initialized.current) return;
+
+    initialized.current = true;
+    const audio = createAudio(musicInfo.fileUrl);
+    document.body.appendChild(audio);
+    audio.addEventListener("canplaythrough", () => {
+      setOpen(false);
+    });
+    audio.addEventListener("play", () => {
+      isPlayingRef.current = true;
+      loopEffect();
+    });
+    audio.addEventListener("pause", () => {
+      isPlayingRef.current = false;
+    });
+  }, []);
 
   useEffect(() => {
     const handleResize = () =>
@@ -53,10 +88,7 @@ const AudioPlayer: React.FC = () => {
     }
     const draftArray: Uint8Array = new Uint8Array(256);
     renderCurrentTime(draftArray);
-    loadImage(
-      process.env.PUBLIC_URL +
-        "/static/music/light/T002R300x300M000001bxCCd4F99oN_1.webp"
-    ).then((img) => {
+    loadImage(musicInfo.coverUrl).then((img) => {
       coverRef.current = img as HTMLImageElement;
       if (!isPlayingRef.current) {
         renderCurrentTime(draftArray);
@@ -67,7 +99,7 @@ const AudioPlayer: React.FC = () => {
   useEffect(() => {
     audioAnalyser.analyser.getByteFrequencyData(audioAnalyser.buffer);
     renderCurrentTime(audioAnalyser.buffer);
-  }, [size]);
+  }, [size, color]);
 
   useEffect(() => {
     waveformEffect.initCapYPositionArray();
@@ -114,21 +146,6 @@ const AudioPlayer: React.FC = () => {
     loopIdRef.current = window.requestAnimationFrame(loopEffect);
   };
 
-  const handleLoadedMetadata = () => {
-    if (!audioRef.current) return;
-
-    audioAnalyser.createAnalyser(audioRef.current);
-  };
-
-  const handleOnPlay = () => {
-    isPlayingRef.current = true;
-    loopEffect();
-  };
-
-  const handleOnPause = () => {
-    isPlayingRef.current = false;
-  };
-
   const handleChangeColor = (color) => {
     setColor(color.rgb);
     waveformEffect.updateWaveColor(color.rgb);
@@ -152,12 +169,7 @@ const AudioPlayer: React.FC = () => {
         <span style={{ color: `rgb(${color.r}, ${color.g}, ${color.b})` }}>
           wave color
         </span>
-        <SketchPicker
-          disableAlpha
-          color={color}
-          // onChangeComplete={handleChangeColor}
-          onChange={handleChangeColor}
-        />
+        <SketchPicker disableAlpha color={color} onChange={handleChangeColor} />
       </div>
       <canvas
         ref={canvasRef}
@@ -165,43 +177,9 @@ const AudioPlayer: React.FC = () => {
         height={size.height * window.devicePixelRatio}
         style={{ width: size.width, height: size.height }}
       />
-      {/* <audio
-        controls
-        autoPlay
-        // crossOrigin="anonymous"
-        ref={audioRef}
-        onLoadedMetadata={handleLoadedMetadata}
-        onPlay={handleOnPlay}
-        onPause={handleOnPause}
-        onCanPlayThrough={() => console.log("canplay")}
-        onSeeking={() => console.log("seeking...")}
-        onSeeked={() => console.log("seeked")}
-      >
-        <source
-          src={process.env.PUBLIC_URL + "/static/music/C400001hagjX2qGWlP.mp3"}
-          type="video/mp4"
-        />
-      </audio> */}
-      <video
-        controls
-        autoPlay
-        crossOrigin="anonymous"
-        ref={audioRef}
-        onLoadedMetadata={handleLoadedMetadata}
-        onPlay={handleOnPlay}
-        onPause={handleOnPause}
-        onCanPlayThrough={() => console.log("canplay")}
-        onSeeking={() => console.log("seeking...")}
-        onSeeked={() => console.log("seeked")}
-      >
-        <source
-          src={
-            process.env.PUBLIC_URL +
-            "/static/music/light/C40000269pkB4fcQVa.mp4"
-          }
-          type="video/mp4"
-        />
-      </video>
+      <Backdrop className={classes.backdrop} open={open}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Fragment>
   );
 };
