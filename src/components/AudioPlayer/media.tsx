@@ -6,6 +6,13 @@ interface MediaProps {
   src: string;
 }
 
+// function fetchSourceToBlob(url: string) {
+//   return window
+//     .fetch(url)
+//     .then((res) => res.blob())
+//     .then((blob) => window.URL.createObjectURL(blob));
+// }
+
 const MediaElement: ForwardRefExoticComponent<
   MediaProps & RefAttributes<unknown>
 > = forwardRef<unknown, MediaProps>((props, ref) => {
@@ -30,6 +37,7 @@ const MediaElement: ForwardRefExoticComponent<
     });
     media.addEventListener("play", () => {
       console.log("play");
+      media.muted = false;
     });
     media.addEventListener("pause", () => {
       console.log("pause");
@@ -44,7 +52,7 @@ const MediaElement: ForwardRefExoticComponent<
 
   return (
     // @ts-ignore
-    <video ref={mediaRef} controls autoPlay name="media">
+    <video ref={mediaRef} controls autoPlay muted name="media">
       <source src={src} type="video/mp4"></source>
     </video>
   );
