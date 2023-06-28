@@ -23,7 +23,6 @@ const MediaElement: ForwardRefExoticComponent<
   MediaProps & RefAttributes<unknown>
 > = forwardRef<unknown, MediaProps>((props, ref) => {
   const { src } = props;
-  const [muted, setMuted] = useState<boolean>(true);
   const mediaRef = useRef<HTMLVideoElement>(null);
   const initialized = useRef<boolean>(false);
 
@@ -44,7 +43,6 @@ const MediaElement: ForwardRefExoticComponent<
     });
     media.addEventListener("play", () => {
       console.log("play");
-      setMuted(false);
     });
     media.addEventListener("pause", () => {
       console.log("pause");
@@ -59,7 +57,7 @@ const MediaElement: ForwardRefExoticComponent<
 
   return (
     // @ts-ignore
-    <video ref={mediaRef} controls autoPlay muted={muted} name="media">
+    <video ref={mediaRef} controls name="media">
       <source src={src} type="video/mp4"></source>
     </video>
   );

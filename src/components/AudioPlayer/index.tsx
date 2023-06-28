@@ -43,6 +43,7 @@ const AudioPlayer: React.FC = () => {
     waveformEffect.getWaveColor()
   );
   const [open, setOpen] = useState<boolean>(true);
+  const [clickPlay, setClickPlay] = useState<boolean>(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -64,6 +65,7 @@ const AudioPlayer: React.FC = () => {
     lyric.parseLyric(musicInfo.lyric);
     media.addEventListener("canplaythrough", () => {
       setOpen(false);
+      setClickPlay(true);
     });
     media.addEventListener("play", () => {
       isPlayingRef.current = true;
@@ -185,6 +187,19 @@ const AudioPlayer: React.FC = () => {
       <MediaElement ref={mediaRef} src={musicInfo.fileUrl} />
       <Backdrop className={classes.backdrop} open={open}>
         <CircularProgress color="inherit" />
+      </Backdrop>
+      <Backdrop
+        className={classes.backdrop}
+        style={{ cursor: "pointer" }}
+        open={clickPlay}
+        onClick={() => {
+          setClickPlay(false);
+          mediaRef.current?.play();
+        }}
+      >
+        <span style={{ fontSize: 50, fontWeight: "bold" }}>
+          Click on any area to play
+        </span>
       </Backdrop>
     </Fragment>
   );
