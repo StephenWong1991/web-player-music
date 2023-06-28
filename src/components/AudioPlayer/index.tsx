@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, Fragment } from "react";
 import Button from "@material-ui/core/Button";
 import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
+// import CircularProgress from "@material-ui/core/CircularProgress";
 import { makeStyles } from "@material-ui/core/styles";
 import { SketchPicker } from "react-color";
 import MediaElement from "./media";
@@ -42,8 +42,9 @@ const AudioPlayer: React.FC = () => {
   const [color, setColor] = useState<{ r: number; g: number; b: number }>(
     waveformEffect.getWaveColor()
   );
-  const [open, setOpen] = useState<boolean>(true);
+  // const [open, setOpen] = useState<boolean>(true);
   const [clickPlay, setClickPlay] = useState<boolean>(true);
+  const [displayColorPicker, setDisplayColorPicker] = useState<boolean>(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -73,9 +74,9 @@ const AudioPlayer: React.FC = () => {
     };
     const media = mediaRef.current!;
     lyric.parseLyric(musicInfo.lyric);
-    media.addEventListener("canplaythrough", () => {
-      setOpen(false);
-    });
+    // media.addEventListener("canplaythrough", () => {
+    //   setOpen(false);
+    // });
     media.addEventListener("play", () => {
       isPlayingRef.current = true;
       loopEffect();
@@ -173,10 +174,21 @@ const AudioPlayer: React.FC = () => {
         ))}
       </div>
       <div className="sketchPicker">
-        <span style={{ color: `rgb(${color.r}, ${color.g}, ${color.b})` }}>
+        <Button
+          variant="contained"
+          color="primary"
+          style={{ color: `rgb(${color.r}, ${color.g}, ${color.b})` }}
+          onClick={() => setDisplayColorPicker((state) => !state)}
+        >
           wave color
-        </span>
-        <SketchPicker disableAlpha color={color} onChange={handleChangeColor} />
+        </Button>
+        {displayColorPicker && (
+          <SketchPicker
+            disableAlpha
+            color={color}
+            onChange={handleChangeColor}
+          />
+        )}
       </div>
       <canvas
         ref={canvasRef}
@@ -200,9 +212,9 @@ const AudioPlayer: React.FC = () => {
           Click on any area to play
         </span>
       </Backdrop>
-      <Backdrop className={classes.backdrop} open={open}>
+      {/* <Backdrop className={classes.backdrop} open={open}>
         <CircularProgress color="inherit" />
-      </Backdrop>
+      </Backdrop> */}
     </Fragment>
   );
 };

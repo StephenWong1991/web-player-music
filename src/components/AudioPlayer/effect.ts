@@ -5,7 +5,7 @@ class WaveformEffect {
   private b = 70;
 
   // arc
-  private radius = 450;
+  private radius = Math.min(window.innerWidth - 100, 450);
   private coverRadius = this.radius - 30;
   private rectWidth = 5; // 初始旋转角度
 

@@ -11,10 +11,6 @@ class Lyric {
   private g = 148;
   private b = 70;
 
-  constructor() {
-    document.body.appendChild(this.lyricCanvas);
-  }
-
   parseLyric(lyric: string[]): void {
     this.lyricData = [];
     for (let i = 0; i < lyric.length; i++) {
