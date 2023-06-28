@@ -43,7 +43,7 @@ const AudioPlayer: React.FC = () => {
     waveformEffect.getWaveColor()
   );
   const [open, setOpen] = useState<boolean>(true);
-  const [clickPlay, setClickPlay] = useState<boolean>(false);
+  const [clickPlay, setClickPlay] = useState<boolean>(true);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -65,7 +65,6 @@ const AudioPlayer: React.FC = () => {
     lyric.parseLyric(musicInfo.lyric);
     media.addEventListener("canplaythrough", () => {
       setOpen(false);
-      setClickPlay(true);
     });
     media.addEventListener("play", () => {
       isPlayingRef.current = true;
@@ -101,14 +100,16 @@ const AudioPlayer: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    audioAnalyser.analyser.getByteFrequencyData(audioAnalyser.buffer);
-    renderCurrentTime(audioAnalyser.buffer);
+    if (!audioAnalyser.analyser) return;
+    audioAnalyser.analyser!.getByteFrequencyData(audioAnalyser.buffer!);
+    renderCurrentTime(audioAnalyser.buffer!);
   }, [size, color]);
 
   useEffect(() => {
+    if (!audioAnalyser.analyser) return;
     waveformEffect.initCapYPositionArray();
-    audioAnalyser.analyser.getByteFrequencyData(audioAnalyser.buffer);
-    renderCurrentTime(audioAnalyser.buffer);
+    audioAnalyser.analyser!.getByteFrequencyData(audioAnalyser.buffer!);
+    renderCurrentTime(audioAnalyser.buffer!);
   }, [effect]);
 
   const renderCurrentTime = (datas: Uint8Array) => {
@@ -147,8 +148,8 @@ const AudioPlayer: React.FC = () => {
       return;
     }
 
-    audioAnalyser.analyser.getByteFrequencyData(audioAnalyser.buffer);
-    renderCurrentTime(audioAnalyser.buffer);
+    audioAnalyser.analyser!.getByteFrequencyData(audioAnalyser.buffer!);
+    renderCurrentTime(audioAnalyser.buffer!);
     loopIdRef.current = window.requestAnimationFrame(loopEffect);
   };
 
@@ -185,21 +186,23 @@ const AudioPlayer: React.FC = () => {
         style={{ width: size.width, height: size.height }}
       />
       <MediaElement ref={mediaRef} src={musicInfo.fileUrl} />
-      <Backdrop className={classes.backdrop} open={open}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
       <Backdrop
         className={classes.backdrop}
         style={{ cursor: "pointer" }}
         open={clickPlay}
         onClick={() => {
           setClickPlay(false);
+          audioAnalyser.initAnalyser();
+          audioAnalyser.createAnalyser(mediaRef.current!);
           mediaRef.current?.play();
         }}
       >
         <span style={{ fontSize: 50, fontWeight: "bold" }}>
           Click on any area to play
         </span>
+      </Backdrop>
+      <Backdrop className={classes.backdrop} open={open}>
+        <CircularProgress color="inherit" />
       </Backdrop>
     </Fragment>
   );

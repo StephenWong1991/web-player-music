@@ -1,9 +1,9 @@
 class AudioAnalyser {
-  private audioCtx: AudioContext;
-  public analyser: AnalyserNode;
-  public buffer: Uint8Array;
+  private audioCtx: AudioContext | undefined;
+  public analyser: AnalyserNode | undefined;
+  public buffer: Uint8Array | undefined;
 
-  constructor() {
+  initAnalyser() {
     this.audioCtx = new AudioContext();
     this.analyser = this.audioCtx.createAnalyser();
     this.analyser.fftSize = 512;
@@ -11,14 +11,14 @@ class AudioAnalyser {
   }
 
   createAnalyser(audio: HTMLMediaElement): void {
-    this.buffer = new Uint8Array(this.analyser.frequencyBinCount);
+    this.buffer = new Uint8Array(this.analyser!.frequencyBinCount);
     this.connectAudio(audio);
   }
 
   connectAudio(audio: HTMLMediaElement): void {
-    const source = this.audioCtx.createMediaElementSource(audio);
-    source.connect(this.analyser);
-    this.analyser.connect(this.audioCtx.destination);
+    const source = this.audioCtx!.createMediaElementSource(audio);
+    source.connect(this.analyser!);
+    this.analyser!.connect(this.audioCtx!.destination);
   }
 }
 

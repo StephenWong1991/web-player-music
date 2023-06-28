@@ -36,7 +36,6 @@ const MediaElement: ForwardRefExoticComponent<
 
     media.addEventListener("loadedmetadata", () => {
       console.log("loadedmetadata");
-      audioAnalyser.createAnalyser(media);
     });
     media.addEventListener("canplaythrough", () => {
       console.log("canplaythrough");
