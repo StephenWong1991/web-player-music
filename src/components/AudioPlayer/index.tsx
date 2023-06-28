@@ -4,9 +4,10 @@ import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { makeStyles } from "@material-ui/core/styles";
 import { SketchPicker } from "react-color";
-import { createAudio } from "./audio";
+import MediaElement from "./media";
 import audioAnalyser from "./audioAnalyser";
 import waveformEffect from "./effect";
+import lyric from "./lyric";
 import { loadImage } from "../../utils";
 
 import musicInfo from "../../mock";
@@ -45,6 +46,7 @@ const AudioPlayer: React.FC = () => {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const mediaRef = useRef<HTMLVideoElement | null>(null);
   const loopIdRef = useRef<number | null>(null);
   const isPlayingRef = useRef<boolean>(false);
   const coverRef = useRef<HTMLImageElement | null>(null);
@@ -58,16 +60,16 @@ const AudioPlayer: React.FC = () => {
     if (initialized.current) return;
 
     initialized.current = true;
-    const audio = createAudio(musicInfo.fileUrl);
-    document.body.appendChild(audio);
-    audio.addEventListener("canplaythrough", () => {
+    const media = mediaRef.current!;
+    lyric.parseLyric(musicInfo.lyric);
+    media.addEventListener("canplaythrough", () => {
       setOpen(false);
     });
-    audio.addEventListener("play", () => {
+    media.addEventListener("play", () => {
       isPlayingRef.current = true;
       loopEffect();
     });
-    audio.addEventListener("pause", () => {
+    media.addEventListener("pause", () => {
       isPlayingRef.current = false;
     });
   }, []);
@@ -133,6 +135,8 @@ const AudioPlayer: React.FC = () => {
     if (lastEffect.current === MusicEffect.BAR) {
       waveformEffect.drawBarWaveform(ctx, datas);
     }
+
+    lyric.drawLyric(mediaRef.current as HTMLVideoElement, ctx);
   };
 
   const loopEffect = () => {
@@ -149,6 +153,7 @@ const AudioPlayer: React.FC = () => {
   const handleChangeColor = (color) => {
     setColor(color.rgb);
     waveformEffect.updateWaveColor(color.rgb);
+    lyric.updateColor(color.rgb);
   };
 
   return (
@@ -177,6 +182,7 @@ const AudioPlayer: React.FC = () => {
         height={size.height * window.devicePixelRatio}
         style={{ width: size.width, height: size.height }}
       />
+      <MediaElement ref={mediaRef} src={musicInfo.fileUrl} />
       <Backdrop className={classes.backdrop} open={open}>
         <CircularProgress color="inherit" />
       </Backdrop>
