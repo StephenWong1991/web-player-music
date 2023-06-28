@@ -27,7 +27,6 @@ const MediaElement: ForwardRefExoticComponent<
     });
     media.addEventListener("canplaythrough", () => {
       console.log("canplaythrough");
-      media.play();
     });
     media.addEventListener("play", () => {
       console.log("play");
@@ -44,10 +43,10 @@ const MediaElement: ForwardRefExoticComponent<
   }, []);
 
   return (
-    // <video controls autoPlay name="media">
-    //   <source src={src} type="video/mp4" />
-    // </video>
-    <video ref={mediaRef} controls autoPlay src={src} />
+    // @ts-ignore
+    <video ref={mediaRef} controls autoPlay name="media">
+      <source src={src} type="video/mp4"></source>
+    </video>
   );
 });
 
