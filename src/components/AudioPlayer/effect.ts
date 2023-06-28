@@ -111,15 +111,19 @@ class WaveformEffect {
       ctx.save();
       ctx.translate(rectX + this.rectWidth / 2, rectY + rectHeight / 2);
       ctx.rotate(rectAngle);
-      // ctx.fillRect(-rectWidth / 2, -rectHeight, rectWidth, rectHeight);
-      // ! chrome99+
-      ctx.roundRect(
-        -this.rectWidth / 2,
-        -rectHeight,
-        this.rectWidth,
-        rectHeight,
-        20
-      );
+      if (ctx.roundRect) {
+        // ! chrome99+
+        ctx.roundRect(
+          -this.rectWidth / 2,
+          -rectHeight,
+          this.rectWidth,
+          rectHeight,
+          20
+        );
+      } else {
+        ctx.rect(-this.rectWidth / 2, -rectHeight, this.rectWidth, rectHeight);
+      }
+
       ctx.restore();
     }
 
@@ -336,13 +340,23 @@ class WaveformEffect {
       }
 
       ctx.fillStyle = gradient;
-      ctx.roundRect(
-        xStart + i * (meterWidth + gap),
-        yStart - value + capHeight,
-        meterWidth,
-        value,
-        2
-      );
+      if (ctx.roundRect) {
+        // ! chrome99+
+        ctx.roundRect(
+          xStart + i * (meterWidth + gap),
+          yStart - value + capHeight,
+          meterWidth,
+          value,
+          2
+        );
+      } else {
+        ctx.rect(
+          xStart + i * (meterWidth + gap),
+          yStart - value + capHeight,
+          meterWidth,
+          value
+        );
+      }
     }
     ctx.fill();
   }

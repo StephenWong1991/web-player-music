@@ -61,6 +61,16 @@ const AudioPlayer: React.FC = () => {
     if (initialized.current) return;
 
     initialized.current = true;
+
+    const loopEffect = () => {
+      if (!isPlayingRef.current) {
+        window.cancelAnimationFrame(loopIdRef.current!);
+        return;
+      }
+      audioAnalyser.analyser!.getByteFrequencyData(audioAnalyser.buffer!);
+      renderCurrentTime(audioAnalyser.buffer!);
+      loopIdRef.current = window.requestAnimationFrame(loopEffect);
+    };
     const media = mediaRef.current!;
     lyric.parseLyric(musicInfo.lyric);
     media.addEventListener("canplaythrough", () => {
@@ -140,17 +150,6 @@ const AudioPlayer: React.FC = () => {
     }
 
     lyric.drawLyric(mediaRef.current as HTMLVideoElement, ctx);
-  };
-
-  const loopEffect = () => {
-    if (!isPlayingRef.current) {
-      window.cancelAnimationFrame(loopIdRef.current!);
-      return;
-    }
-
-    audioAnalyser.analyser!.getByteFrequencyData(audioAnalyser.buffer!);
-    renderCurrentTime(audioAnalyser.buffer!);
-    loopIdRef.current = window.requestAnimationFrame(loopEffect);
   };
 
   const handleChangeColor = (color) => {

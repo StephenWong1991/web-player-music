@@ -1,4 +1,4 @@
-export default {
+const mockData = {
   albumName: "日光倾城",
   auth: "卡奇社",
   coverUrl:
@@ -66,3 +66,5 @@ export default {
     "[04:47.42]观看了一颗流星坠毁了",
   ],
 };
+
+export default mockData;

@@ -1,12 +1,5 @@
-import {
-  useState,
-  useRef,
-  useEffect,
-  forwardRef,
-  useImperativeHandle,
-} from "react";
+import { useRef, useEffect, forwardRef, useImperativeHandle } from "react";
 import type { ForwardRefExoticComponent, RefAttributes } from "react";
-import audioAnalyser from "./audioAnalyser";
 
 interface MediaProps {
   src: string;
@@ -54,12 +47,7 @@ const MediaElement: ForwardRefExoticComponent<
     });
   }, []);
 
-  return (
-    // @ts-ignore
-    <video ref={mediaRef} controls name="media">
-      <source src={src} type="video/mp4"></source>
-    </video>
-  );
+  return <audio ref={mediaRef} controls src={src} />;
 });
 
 export default MediaElement;
