@@ -1,9 +1,9 @@
 class AudioAnalyser {
-  private audioCtx: AudioContext | undefined;
-  public analyser: AnalyserNode | undefined;
-  public buffer: Uint8Array | undefined;
+  private audioCtx?: AudioContext;
+  public analyser?: AnalyserNode;
+  public buffer?: Uint8Array;
 
-  initAnalyser() {
+  initAnalyser(): void {
     this.audioCtx = new AudioContext();
     this.analyser = this.audioCtx.createAnalyser();
     this.analyser.fftSize = 512;

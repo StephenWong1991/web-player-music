@@ -24,17 +24,17 @@ class WaveformEffect {
   // bar
   private capYPositionArray: number[] = [];
 
-  waveColor(opacity = 1) {
+  waveColor(opacity = 1): string {
     return `rgba(${this.r}, ${this.g}, ${this.b}, ${opacity})`;
   }
 
-  updateWaveColor(color: { r: number; g: number; b: number }) {
+  updateWaveColor(color: { r: number; g: number; b: number }): void {
     this.r = color.r;
     this.g = color.g;
     this.b = color.b;
   }
 
-  getWaveColor() {
+  getWaveColor(): { r: number; g: number; b: number } {
     return {
       r: this.r,
       g: this.g,
@@ -42,7 +42,10 @@ class WaveformEffect {
     };
   }
 
-  drawBlurBg(img: HTMLImageElement | null, ctx: CanvasRenderingContext2D) {
+  drawBlurBg(
+    img: HTMLImageElement | null,
+    ctx: CanvasRenderingContext2D
+  ): void {
     if (!img) return;
 
     const { width, height } = ctx.canvas;
@@ -56,7 +59,7 @@ class WaveformEffect {
     ctx.restore();
   }
 
-  drawCover(img: HTMLImageElement | null, ctx: CanvasRenderingContext2D) {
+  drawCover(img: HTMLImageElement | null, ctx: CanvasRenderingContext2D): void {
     if (!img) return;
 
     const { width, height } = ctx.canvas;
@@ -82,7 +85,7 @@ class WaveformEffect {
     this.rotation += 0.01;
   }
 
-  drawArcWaveform(ctx: CanvasRenderingContext2D, datas: Uint8Array) {
+  drawArcWaveform(ctx: CanvasRenderingContext2D, datas: Uint8Array): void {
     const len = datas.length;
     const offset = Math.floor((len * 2) / 3);
     const waveformList = new Array(offset * 2);
@@ -130,7 +133,7 @@ class WaveformEffect {
     ctx.fill();
   }
 
-  drawArcLineWaveform(ctx: CanvasRenderingContext2D, datas: Uint8Array) {
+  drawArcLineWaveform(ctx: CanvasRenderingContext2D, datas: Uint8Array): void {
     const len = datas.length;
     const offset = Math.floor((len * 2) / 3);
     const waveformList = new Array(offset * 2);
@@ -222,8 +225,11 @@ class WaveformEffect {
     });
   }
 
-  drawArcLineDottedWaveform(ctx: CanvasRenderingContext2D, datas: Uint8Array) {
-    const step = 5;
+  drawArcLineDottedWaveform(
+    ctx: CanvasRenderingContext2D,
+    datas: Uint8Array
+  ): void {
+    const step = 3;
     const len = datas.length;
     const waveformList = new Array(len);
 
@@ -275,11 +281,11 @@ class WaveformEffect {
     ctx.fill();
   }
 
-  initCapYPositionArray() {
+  initCapYPositionArray(): void {
     this.capYPositionArray.length = 0;
   }
 
-  drawBarWaveform(ctx: CanvasRenderingContext2D, datas: Uint8Array) {
+  drawBarWaveform(ctx: CanvasRenderingContext2D, datas: Uint8Array): void {
     const len = datas.length;
     const offset = Math.floor(len * 2);
     const waveformList = new Array(offset);

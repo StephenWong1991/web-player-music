@@ -7,9 +7,9 @@ class Lyric {
     this.lyricCanvas.getContext("2d");
 
   // color
-  private r = 236;
-  private g = 148;
-  private b = 70;
+  private r: number = 236;
+  private g: number = 148;
+  private b: number = 70;
 
   parseLyric(lyric: string[]): void {
     this.lyricData = [];
@@ -27,7 +27,7 @@ class Lyric {
     }
   }
 
-  updateColor(color: { r: number; g: number; b: number }) {
+  updateColor(color: { r: number; g: number; b: number }): void {
     this.r = color.r;
     this.g = color.g;
     this.b = color.b;
