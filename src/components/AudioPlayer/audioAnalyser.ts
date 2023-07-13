@@ -11,14 +11,22 @@ class AudioAnalyser {
   }
 
   createAnalyser(audio: HTMLMediaElement): void {
-    this.buffer = new Uint8Array(this.analyser!.frequencyBinCount);
+    if (!this.analyser) {
+      return;
+    }
+
+    this.buffer = new Uint8Array(this.analyser.frequencyBinCount);
     this.connectAudio(audio);
   }
 
   connectAudio(audio: HTMLMediaElement): void {
-    const source = this.audioCtx!.createMediaElementSource(audio);
-    source.connect(this.analyser!);
-    this.analyser!.connect(this.audioCtx!.destination);
+    if (!this.analyser || !this.audioCtx) {
+      return;
+    }
+
+    const source = this.audioCtx.createMediaElementSource(audio);
+    source.connect(this.analyser);
+    this.analyser.connect(this.audioCtx.destination);
   }
 }
 

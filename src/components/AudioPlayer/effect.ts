@@ -1,3 +1,5 @@
+import { ColorRGBObj } from "../../types";
+
 class WaveformEffect {
   // color
   private r = 236;
@@ -28,13 +30,13 @@ class WaveformEffect {
     return `rgba(${this.r}, ${this.g}, ${this.b}, ${opacity})`;
   }
 
-  updateWaveColor(color: { r: number; g: number; b: number }): void {
+  updateWaveColor(color: ColorRGBObj): void {
     this.r = color.r;
     this.g = color.g;
     this.b = color.b;
   }
 
-  getWaveColor(): { r: number; g: number; b: number } {
+  getColor(): ColorRGBObj {
     return {
       r: this.r,
       g: this.g,
@@ -42,11 +44,10 @@ class WaveformEffect {
     };
   }
 
-  drawBlurBg(
-    img: HTMLImageElement | null,
-    ctx: CanvasRenderingContext2D
-  ): void {
-    if (!img) return;
+  drawBlurBg(img: HTMLImageElement, ctx: CanvasRenderingContext2D): void {
+    if (!img) {
+      return;
+    }
 
     const { width, height } = ctx.canvas;
     const centerX = width / 2;
@@ -59,8 +60,10 @@ class WaveformEffect {
     ctx.restore();
   }
 
-  drawCover(img: HTMLImageElement | null, ctx: CanvasRenderingContext2D): void {
-    if (!img) return;
+  drawCover(img: HTMLImageElement, ctx: CanvasRenderingContext2D): void {
+    if (!img) {
+      return;
+    }
 
     const { width, height } = ctx.canvas;
     const centerX = width / 2;

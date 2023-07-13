@@ -1,3 +1,5 @@
+import { ColorRGBObj } from "../../types";
+
 const regex = /\[(.*?)\](.*)/;
 
 class Lyric {
@@ -27,7 +29,7 @@ class Lyric {
     }
   }
 
-  updateColor(color: { r: number; g: number; b: number }): void {
+  updateColor(color: ColorRGBObj): void {
     this.r = color.r;
     this.g = color.g;
     this.b = color.b;
@@ -56,6 +58,10 @@ class Lyric {
   }
 
   drawLyric(audio: HTMLAudioElement, ctx: CanvasRenderingContext2D): void {
+    if (!this.lyricCtx) {
+      return;
+    }
+
     const currentTime = audio.currentTime;
     const { lyric, startTime, endTime } =
       this.findCurrentTimeLyric(currentTime);
@@ -79,14 +85,14 @@ class Lyric {
     this.lyricCanvas.height = ctx.canvas.height;
     this.lyricCanvas.style.width = ctx.canvas.style.width;
     this.lyricCanvas.style.height = ctx.canvas.style.height;
-    this.lyricCtx!.font = `bold ${fontSize}px serif`;
-    this.lyricCtx!.globalAlpha = 1;
-    this.lyricCtx!.textBaseline = "bottom";
-    this.lyricCtx!.textAlign = "left";
-    this.lyricCtx!.fillStyle = `rgb(${this.r}, ${this.g}, ${this.b})`;
-    this.lyricCtx!.fillText(lyric, startX, startY);
+    this.lyricCtx.font = `bold ${fontSize}px serif`;
+    this.lyricCtx.globalAlpha = 1;
+    this.lyricCtx.textBaseline = "bottom";
+    this.lyricCtx.textAlign = "left";
+    this.lyricCtx.fillStyle = `rgb(${this.r}, ${this.g}, ${this.b})`;
+    this.lyricCtx.fillText(lyric, startX, startY);
     const startClearX = startX + textWidth * percent;
-    this.lyricCtx!.clearRect(
+    this.lyricCtx.clearRect(
       startClearX,
       0,
       this.lyricCanvas.width - startClearX,

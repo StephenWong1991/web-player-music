@@ -1,4 +1,10 @@
-import { useRef, useEffect, forwardRef, useImperativeHandle } from "react";
+import {
+  useRef,
+  useEffect,
+  createRef,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import type { ForwardRefExoticComponent, RefAttributes } from "react";
 
 interface MediaProps {
@@ -9,13 +15,15 @@ const MediaElement: ForwardRefExoticComponent<
   MediaProps & RefAttributes<unknown>
 > = forwardRef<unknown, MediaProps>((props, ref) => {
   const { src } = props;
-  const mediaRef = useRef<HTMLVideoElement>(null);
+  const mediaRef = createRef<HTMLVideoElement>();
   const initialized = useRef<boolean>(false);
 
   useImperativeHandle(ref, () => mediaRef.current);
 
   useEffect(() => {
-    if (initialized.current) return;
+    if (initialized.current) {
+      return;
+    }
 
     initialized.current = true;
     const media = mediaRef.current!;

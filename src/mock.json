@@ -1,11 +1,9 @@
-const mockData = {
-  albumName: "晴天",
-  auth: "周杰伦",
-  coverUrl:
-    process.env.PUBLIC_URL +
-    "/static/music/jay/T002R300x300M000000MkMni19ClKG.webp",
-  fileUrl: process.env.PUBLIC_URL + "/static/music/jay/C400002202B43Cq4V4.mp4",
-  lyric: [
+{
+  "albumName": "晴天",
+  "auth": "周杰伦",
+  "coverUrl": "/static/music/jay/T002R300x300M000000MkMni19ClKG.webp",
+  "fileUrl": "/static/music/jay/C400002202B43Cq4V4.mp4",
+  "lyric": [
     "[00:00.00]晴天 - 周杰伦 (Jay Chou)",
     "[00:02.25]词：周杰伦",
     "[00:04.50]曲：周杰伦",
@@ -68,8 +66,6 @@ const mockData = {
     "[04:12.92]从前从前有个人爱你很久",
     "[04:15.91]但偏偏雨渐渐把距离吹得好远",
     "[04:19.38]好不容易又能再多爱一天",
-    "[04:22.86]但故事的最后你好像还是说了拜",
-  ],
-};
-
-export default mockData;
+    "[04:22.86]但故事的最后你好像还是说了拜"
+  ]
+}

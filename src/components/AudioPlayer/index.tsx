@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, Fragment } from "react";
+import React, { useState, useRef, useEffect, createRef, Fragment } from "react";
 import Button from "@material-ui/core/Button";
 import Backdrop from "@material-ui/core/Backdrop";
 import { makeStyles } from "@material-ui/core/styles";
@@ -8,8 +8,9 @@ import audioAnalyser from "./audioAnalyser";
 import waveformEffect from "./effect";
 import lyric from "./lyric";
 import { loadImage } from "../../utils";
+import { ColorRGBObj } from "../../types";
 
-import musicInfo from "../../mock";
+import musicInfo from "../../mock.json";
 
 enum MusicEffect {
   ARC = "arc",
@@ -18,6 +19,7 @@ enum MusicEffect {
   BAR = "bar",
 }
 
+const draftArray: Uint8Array = new Uint8Array(256);
 const useStyles = makeStyles((theme) => ({
   root: {
     "& > *": {
@@ -31,39 +33,40 @@ const useStyles = makeStyles((theme) => ({
     color: "#fff",
   },
 }));
+const getSize = () => ({
+  width: window.innerWidth,
+  height: window.innerHeight,
+});
 
 const AudioPlayer: React.FC = () => {
-  const [size, setSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
+  const [size, setSize] = useState(getSize());
   const [effect, setEffect] = useState<MusicEffect>(MusicEffect.ARC);
-  const [color, setColor] = useState<{ r: number; g: number; b: number }>(
-    waveformEffect.getWaveColor()
-  );
+  const [color, setColor] = useState<ColorRGBObj>(waveformEffect.getColor());
   const [clickPlay, setClickPlay] = useState<boolean>(true);
   const [displayColorPicker, setDisplayColorPicker] = useState<boolean>(false);
 
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
-  const mediaRef = useRef<HTMLVideoElement | null>(null);
-  const loopIdRef = useRef<number | null>(null);
+  const canvasRef = createRef<HTMLCanvasElement>();
+  const ctxRef = useRef<CanvasRenderingContext2D>();
+  const mediaRef = useRef<HTMLVideoElement>();
+  const loopIdRef = useRef<number>(0);
+  const coverRef = useRef<HTMLImageElement>();
   const isPlayingRef = useRef<boolean>(false);
-  const coverRef = useRef<HTMLImageElement | null>(null);
-  const lastEffect = useRef<MusicEffect>(MusicEffect.ARC);
   const initialized = useRef<boolean>(false);
+  const lastEffect = useRef<MusicEffect>(MusicEffect.ARC);
 
   lastEffect.current = effect;
   const classes = useStyles();
 
   useEffect(() => {
-    if (initialized.current) return;
+    if (initialized.current) {
+      return;
+    }
 
     initialized.current = true;
 
     const loopEffect = () => {
       if (!isPlayingRef.current) {
-        window.cancelAnimationFrame(loopIdRef.current!);
+        window.cancelAnimationFrame(loopIdRef.current);
         return;
       }
       audioAnalyser.analyser!.getByteFrequencyData(audioAnalyser.buffer!);
@@ -82,8 +85,7 @@ const AudioPlayer: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const handleResize = () =>
-      setSize({ width: window.innerWidth, height: window.innerHeight });
+    const handleResize = () => setSize(getSize());
 
     window.addEventListener("resize", handleResize);
     return () => {
@@ -93,12 +95,14 @@ const AudioPlayer: React.FC = () => {
 
   useEffect(() => {
     if (canvasRef.current) {
-      ctxRef.current = canvasRef.current.getContext("2d");
+      ctxRef.current = canvasRef.current.getContext(
+        "2d"
+      ) as CanvasRenderingContext2D;
     }
-    const draftArray: Uint8Array = new Uint8Array(256);
+
     renderCurrentTime(draftArray);
-    loadImage(musicInfo.coverUrl).then((img) => {
-      coverRef.current = img as HTMLImageElement;
+    loadImage(process.env.PUBLIC_URL + musicInfo.coverUrl).then((img) => {
+      coverRef.current = img;
       if (!isPlayingRef.current) {
         renderCurrentTime(draftArray);
       }
@@ -106,22 +110,29 @@ const AudioPlayer: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!audioAnalyser.analyser) return;
-    audioAnalyser.analyser!.getByteFrequencyData(audioAnalyser.buffer!);
+    if (!audioAnalyser.analyser) {
+      renderCurrentTime(draftArray);
+      return;
+    }
+    audioAnalyser.analyser.getByteFrequencyData(audioAnalyser.buffer!);
     renderCurrentTime(audioAnalyser.buffer!);
   }, [size, color]);
 
   useEffect(() => {
-    if (!audioAnalyser.analyser) return;
+    if (!audioAnalyser.analyser || !audioAnalyser.buffer) {
+      return;
+    }
     waveformEffect.initCapYPositionArray();
-    audioAnalyser.analyser!.getByteFrequencyData(audioAnalyser.buffer!);
-    renderCurrentTime(audioAnalyser.buffer!);
+    audioAnalyser.analyser.getByteFrequencyData(audioAnalyser.buffer);
+    renderCurrentTime(audioAnalyser.buffer);
   }, [effect]);
 
   const renderCurrentTime = (datas: Uint8Array): void => {
-    const ctx = ctxRef.current;
-    if (!ctx) return;
+    if (!ctxRef.current || !coverRef.current) {
+      return;
+    }
 
+    const ctx = ctxRef.current;
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     waveformEffect.drawBlurBg(coverRef.current, ctx);
@@ -191,7 +202,10 @@ const AudioPlayer: React.FC = () => {
         height={size.height * window.devicePixelRatio}
         style={{ width: size.width, height: size.height }}
       />
-      <MediaElement ref={mediaRef} src={musicInfo.fileUrl} />
+      <MediaElement
+        ref={mediaRef}
+        src={process.env.PUBLIC_URL + musicInfo.fileUrl}
+      />
       <Backdrop
         className={classes.backdrop}
         style={{ cursor: "pointer" }}
