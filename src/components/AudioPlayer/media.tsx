@@ -46,6 +46,7 @@ const MediaElement: ForwardRefExoticComponent<
     media.addEventListener("seeked", () => {
       console.log("seeked");
     });
+    // eslint-disable-next-line
   }, []);
 
   return <audio ref={mediaRef} controls src={src} />;

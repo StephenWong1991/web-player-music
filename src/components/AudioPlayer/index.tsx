@@ -107,6 +107,7 @@ const AudioPlayer: React.FC = () => {
         renderCurrentTime(draftArray);
       }
     });
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
