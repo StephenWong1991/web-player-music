@@ -1,12 +1,22 @@
 import { ColorRGBObj } from "../../types";
 
+type LyricItem = {
+  time: number;
+  text: string;
+}
+
+type CurrentTimeLyric = {
+  lyric: string;
+  startTime: number;
+  endTime: number;
+}
+
 const regex = /\[(.*?)\](.*)/;
 
 class Lyric {
-  private lyricData: { time: number; text: string }[] = [];
+  private lyricData: LyricItem[] = [];
   private lyricCanvas: HTMLCanvasElement = document.createElement("canvas");
-  private lyricCtx: CanvasRenderingContext2D | null =
-    this.lyricCanvas.getContext("2d");
+  private lyricCtx: CanvasRenderingContext2D = this.lyricCanvas.getContext("2d")!;
 
   // color
   private r: number = 236;
@@ -35,11 +45,7 @@ class Lyric {
     this.b = color.b;
   }
 
-  findCurrentTimeLyric(time: number): {
-    lyric: string;
-    startTime: number;
-    endTime: number;
-  } {
+  findCurrentTimeLyric(time: number): CurrentTimeLyric {
     for (let i = 0; i < this.lyricData.length; i++) {
       const next = Math.min(i + 1, this.lyricData.length - 1);
       if (time >= this.lyricData[i].time && time < this.lyricData[next].time) {
@@ -63,43 +69,41 @@ class Lyric {
     }
 
     const currentTime = audio.currentTime;
-    const { lyric, startTime, endTime } =
-      this.findCurrentTimeLyric(currentTime);
+    const {
+      lyric,
+      startTime,
+      endTime
+    } = this.findCurrentTimeLyric(currentTime);
     const fontSize = 80;
     const startY = 150;
+    const { canvas } = ctx;
+    const { width, height } = canvas;
+    const textWidth = ctx.measureText(lyric).width;
+    const startX = width * 0.5 - textWidth * 0.5;
+    const percent = (currentTime - startTime) / (endTime - startTime);
+    const startClearX = startX + textWidth * percent;
 
     ctx.save();
-
     ctx.font = `bold ${fontSize}px serif`;
     ctx.globalAlpha = 1;
     ctx.textBaseline = "bottom";
     ctx.textAlign = "left";
     ctx.fillStyle = "#fff";
-
-    const textWidth = ctx.measureText(lyric).width;
-    const startX = ctx.canvas.width * 0.5 - textWidth * 0.5;
-    const percent = (currentTime - startTime) / (endTime - startTime);
     ctx.fillText(lyric, startX, startY);
 
-    this.lyricCanvas.width = ctx.canvas.width;
-    this.lyricCanvas.height = ctx.canvas.height;
-    this.lyricCanvas.style.width = ctx.canvas.style.width;
-    this.lyricCanvas.style.height = ctx.canvas.style.height;
+    this.lyricCanvas.width = width;
+    this.lyricCanvas.height = height;
+    this.lyricCanvas.style.width = canvas.style.width;
+    this.lyricCanvas.style.height = canvas.style.height;
     this.lyricCtx.font = `bold ${fontSize}px serif`;
     this.lyricCtx.globalAlpha = 1;
     this.lyricCtx.textBaseline = "bottom";
     this.lyricCtx.textAlign = "left";
     this.lyricCtx.fillStyle = `rgb(${this.r}, ${this.g}, ${this.b})`;
     this.lyricCtx.fillText(lyric, startX, startY);
-    const startClearX = startX + textWidth * percent;
-    this.lyricCtx.clearRect(
-      startClearX,
-      0,
-      this.lyricCanvas.width - startClearX,
-      this.lyricCanvas.height
-    );
-    ctx.drawImage(this.lyricCanvas, 0, 0);
+    this.lyricCtx.clearRect(startClearX, 0, width - startClearX, height);
 
+    ctx.drawImage(this.lyricCanvas, 0, 0);
     ctx.restore();
   }
 }

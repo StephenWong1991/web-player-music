@@ -9,7 +9,6 @@ import waveformEffect from "./effect";
 import lyric from "./lyric";
 import { loadImage } from "../../utils";
 import { ColorRGBObj } from "../../types";
-
 import musicInfo from "../../mock.json";
 
 enum MusicEffect {
@@ -75,6 +74,7 @@ const AudioPlayer: React.FC = () => {
     };
     const media = mediaRef.current!;
     lyric.parseLyric(musicInfo.lyric);
+
     media.addEventListener("play", () => {
       isPlayingRef.current = true;
       loopEffect();
@@ -95,9 +95,7 @@ const AudioPlayer: React.FC = () => {
 
   useEffect(() => {
     if (canvasRef.current) {
-      ctxRef.current = canvasRef.current.getContext(
-        "2d"
-      ) as CanvasRenderingContext2D;
+      ctxRef.current = canvasRef.current.getContext("2d")!;
     }
 
     renderCurrentTime(draftArray);
@@ -141,19 +139,13 @@ const AudioPlayer: React.FC = () => {
     if (lastEffect.current === MusicEffect.ARC) {
       waveformEffect.drawCover(coverRef.current, ctx);
       waveformEffect.drawArcWaveform(ctx, datas);
-    }
-
-    if (lastEffect.current === MusicEffect.ARC_LINE) {
+    } else if (lastEffect.current === MusicEffect.ARC_LINE) {
       waveformEffect.drawCover(coverRef.current, ctx);
       waveformEffect.drawArcLineWaveform(ctx, datas);
-    }
-
-    if (lastEffect.current === MusicEffect.ARC_LINE_DOTTED) {
+    } else if (lastEffect.current === MusicEffect.ARC_LINE_DOTTED) {
       waveformEffect.drawArcLineDottedWaveform(ctx, datas);
       waveformEffect.drawCover(coverRef.current, ctx);
-    }
-
-    if (lastEffect.current === MusicEffect.BAR) {
+    } else if (lastEffect.current === MusicEffect.BAR) {
       waveformEffect.drawBarWaveform(ctx, datas);
     }
 
@@ -164,6 +156,13 @@ const AudioPlayer: React.FC = () => {
     setColor(color.rgb);
     waveformEffect.updateWaveColor(color.rgb);
     lyric.updateColor(color.rgb);
+  };
+
+  const startPlay = () => {
+    setClickPlay(false);
+    audioAnalyser.initAnalyser();
+    audioAnalyser.createAnalyser(mediaRef.current!);
+    mediaRef.current?.play();
   };
 
   return (
@@ -211,12 +210,7 @@ const AudioPlayer: React.FC = () => {
         className={classes.backdrop}
         style={{ cursor: "pointer" }}
         open={clickPlay}
-        onClick={() => {
-          setClickPlay(false);
-          audioAnalyser.initAnalyser();
-          audioAnalyser.createAnalyser(mediaRef.current!);
-          mediaRef.current?.play();
-        }}
+        onClick={startPlay}
       >
         <span style={{ fontSize: 50, fontWeight: "bold" }}>
           Click on any area to play
