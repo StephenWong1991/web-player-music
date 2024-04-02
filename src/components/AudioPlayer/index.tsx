@@ -160,8 +160,7 @@ const AudioPlayer: React.FC = () => {
 
   const startPlay = () => {
     setClickPlay(false);
-    audioAnalyser.initAnalyser();
-    audioAnalyser.createAnalyser(mediaRef.current!);
+    audioAnalyser.connectAnalyser(mediaRef.current!);
     mediaRef.current?.play();
   };
 
