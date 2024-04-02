@@ -78,10 +78,6 @@ class Lyric {
     const startY = 150;
     const { canvas } = ctx;
     const { width, height } = canvas;
-    const textWidth = ctx.measureText(lyric).width;
-    const startX = width * 0.5 - textWidth * 0.5;
-    const percent = (currentTime - startTime) / (endTime - startTime);
-    const startClearX = startX + textWidth * percent;
 
     ctx.save();
     ctx.font = `bold ${fontSize}px serif`;
@@ -89,6 +85,12 @@ class Lyric {
     ctx.textBaseline = "bottom";
     ctx.textAlign = "left";
     ctx.fillStyle = "#fff";
+
+    const textWidth = ctx.measureText(lyric).width;
+    const startX = width * 0.5 - textWidth * 0.5;
+    const percent = (currentTime - startTime) / (endTime - startTime);
+    const startClearX = startX + textWidth * percent;
+
     ctx.fillText(lyric, startX, startY);
 
     this.lyricCanvas.width = width;
