@@ -68,8 +68,11 @@ const AudioPlayer: React.FC = () => {
         window.cancelAnimationFrame(loopIdRef.current);
         return;
       }
-      audioAnalyser.analyser!.getByteFrequencyData(audioAnalyser.buffer!);
-      renderCurrentTime(audioAnalyser.buffer!);
+
+      const analyser = audioAnalyser.getAnalyser()!;
+      const buffer = audioAnalyser.getAnalyserBuffer()!;
+      analyser.getByteFrequencyData(buffer);
+      renderCurrentTime(buffer);
       loopIdRef.current = window.requestAnimationFrame(loopEffect);
     };
     const media = mediaRef.current!;
@@ -109,21 +112,25 @@ const AudioPlayer: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!audioAnalyser.analyser) {
+    const analyser = audioAnalyser.getAnalyser();
+    if (!analyser) {
       renderCurrentTime(draftArray);
       return;
     }
-    audioAnalyser.analyser.getByteFrequencyData(audioAnalyser.buffer!);
-    renderCurrentTime(audioAnalyser.buffer!);
+    const buffer = audioAnalyser.getAnalyserBuffer()!;
+    analyser.getByteFrequencyData(buffer);
+    renderCurrentTime(buffer);
   }, [size, color]);
 
   useEffect(() => {
-    if (!audioAnalyser.analyser || !audioAnalyser.buffer) {
+    const analyser = audioAnalyser.getAnalyser();
+    const buffer = audioAnalyser.getAnalyserBuffer();
+    if (!analyser || !buffer) {
       return;
     }
     waveformEffect.initCapYPositionArray();
-    audioAnalyser.analyser.getByteFrequencyData(audioAnalyser.buffer);
-    renderCurrentTime(audioAnalyser.buffer);
+    analyser.getByteFrequencyData(buffer);
+    renderCurrentTime(buffer);
   }, [effect]);
 
   const renderCurrentTime = (datas: Uint8Array): void => {

@@ -1,7 +1,7 @@
 class AudioAnalyser {
   private audioCtx?: AudioContext;
-  public analyser?: AnalyserNode;
-  public buffer?: Uint8Array;
+  private analyser?: AnalyserNode;
+  private buffer?: Uint8Array;
 
   connectAnalyser(audio: HTMLVideoElement): void {
     // 创建音频上下文
@@ -27,6 +27,14 @@ class AudioAnalyser {
     // this.audioCtx.destination context 中所有音频的最终目标节点 一般是音频渲染设备
     // https://developer.mozilla.org/zh-CN/docs/Web/API/BaseAudioContext/destination
     this.analyser.connect(this.audioCtx.destination);
+  }
+
+  getAnalyser() {
+    return this.analyser;
+  }
+
+  getAnalyserBuffer() {
+    return this.buffer;
   }
 }
 

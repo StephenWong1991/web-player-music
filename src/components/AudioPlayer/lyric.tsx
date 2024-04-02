@@ -5,7 +5,7 @@ type LyricItem = {
   text: string;
 }
 
-type CurrentTimeLyric = {
+type CurrentTimeLyricContent = {
   lyric: string;
   startTime: number;
   endTime: number;
@@ -18,7 +18,7 @@ class Lyric {
   private lyricCanvas: HTMLCanvasElement = document.createElement("canvas");
   private lyricCtx: CanvasRenderingContext2D = this.lyricCanvas.getContext("2d")!;
 
-  // color
+  // default color
   private r: number = 236;
   private g: number = 148;
   private b: number = 70;
@@ -45,7 +45,7 @@ class Lyric {
     this.b = color.b;
   }
 
-  findCurrentTimeLyric(time: number): CurrentTimeLyric {
+  findCurrentTimeLyric(time: number): CurrentTimeLyricContent {
     for (let i = 0; i < this.lyricData.length; i++) {
       const next = Math.min(i + 1, this.lyricData.length - 1);
       if (time >= this.lyricData[i].time && time < this.lyricData[next].time) {
@@ -64,11 +64,7 @@ class Lyric {
   }
 
   drawLyric(audio: HTMLAudioElement, ctx: CanvasRenderingContext2D): void {
-    if (!this.lyricCtx) {
-      return;
-    }
-
-    const currentTime = audio.currentTime;
+    const { currentTime } = audio;
     const {
       lyric,
       startTime,

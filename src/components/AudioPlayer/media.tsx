@@ -11,6 +11,33 @@ interface MediaProps {
   src: string;
 }
 
+const MEDIA_EVENTS = [
+  "abort",
+  "canplay",
+  "canplaythrough",
+  "durationchange",
+  "emptied",
+  "encrypted",
+  "ended",
+  "error",
+  "loadeddata",
+  "loadedmetadata",
+  "loadstart",
+  "pause",
+  "play",
+  "playing",
+  "progress",
+  "ratechange",
+  "resize",
+  "seeked",
+  "seeking",
+  "stalled",
+  "suspend",
+  "timeupdate",
+  "volumechange",
+  "waiting",
+];
+
 const MediaElement: ForwardRefExoticComponent<
   MediaProps & RefAttributes<unknown>
 > = forwardRef<unknown, MediaProps>((props, ref) => {
@@ -26,30 +53,16 @@ const MediaElement: ForwardRefExoticComponent<
     }
 
     initialized.current = true;
-    const media = mediaRef.current!;
 
-    media.addEventListener("loadedmetadata", () => {
-      console.log("loadedmetadata");
-    });
-    media.addEventListener("canplaythrough", () => {
-      console.log("canplaythrough");
-    });
-    media.addEventListener("play", () => {
-      console.log("play");
-    });
-    media.addEventListener("pause", () => {
-      console.log("pause");
-    });
-    media.addEventListener("seeking", () => {
-      console.log("seeking");
-    });
-    media.addEventListener("seeked", () => {
-      console.log("seeked");
+    MEDIA_EVENTS.forEach((event) => {
+      mediaRef.current!.addEventListener(event, () => {
+        console.log(">>>>>>", event);
+      });
     });
     // eslint-disable-next-line
   }, []);
 
-  return <audio ref={mediaRef} controls src={src} />;
+  return <audio ref={mediaRef} src={src} controls />;
 });
 
 export default MediaElement;
